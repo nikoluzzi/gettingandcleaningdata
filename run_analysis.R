@@ -1,7 +1,8 @@
 library(dplyr)
 library(plyr)
-##library(tidyr)
-##Read the file
+library(tidyr)
+
+##Read the files
 xTestPath <- "./UCI HAR Dataset/test/X_test.txt"
 yTestPath <- "./UCI HAR Dataset/test/y_test.txt"
 subjectTestPath <- "./UCI HAR Dataset/test/subject_test.txt"
@@ -14,16 +15,12 @@ featuresPath <- "./UCI HAR Dataset/features.txt"
 activityPaths <- "./UCI HAR Dataset/activity_labels.txt"
 
 xTestData <- read.table(xTestPath)
-yTestData <- read.table(yTestPath,col.names = "Activity")
-subjectTestData <- read.table(subjectTestPath,col.names = "Subject")
-
-
+yTestData <- read.table(yTestPath)
+subjectTestData <- read.table(subjectTestPath)
 
 xTrainData <- read.table(xTrainPath)
-yTrainData <- read.table(yTrainPath,col.names = "Activity")
-subjectTrainData <- read.table(subjectTrainPath,col.names = "Subject")
-
-
+yTrainData <- read.table(yTrainPath)
+subjectTrainData <- read.table(subjectTrainPath)
 
 allTest <- bind_cols(xTestData,yTestData,subjectTestData)
 allTrain <- bind_cols(xTrainData,yTrainData,subjectTrainData)
@@ -55,14 +52,17 @@ activityLabels <- read.table(activityPaths, stringsAsFactors = FALSE)
 activityLabels <- mapvalues(activityLabels$V2, from=activityLabels$V2, to = tolower(activityLabels$V2))
 
 ## Apply the activity names
-data$Activity <- mapvalues(data$Activity, from = c(1, 2, 3,4,5,6), to = activityLabels)
+data$activity <- mapvalues(data$activity, from = c(1, 2, 3,4,5,6), to = activityLabels)
 
-## Clean the columns names by 
-### 
-subsetNames <- tolower(subsetNames)
+
+##subsetNames <- tolower(subsetNames)
 subsetNames <- gsub("-","",subsetNames)
 subsetNames <- gsub("\\(\\)","",subsetNames)
-subsetNames <- c(subsetNames,"Activity","Subject")
+subsetNames <- c(subsetNames,"activity","subject")
 
 names(data) <- subsetNames
-data2 <- data2 %>% group_by(Activity, Subject) %>% summarise_each(c("mean"))
+data2 <- data %>% group_by(activity, subject) %>% summarise_each(c("mean"))
+write.table(data2, file="summarizeddata.txt", row.name=FALSE )
+
+
+
